@@ -41,18 +41,18 @@ UCOIN_DENOM = str(config["Validator"]["UCOIN_DENOM"])
 REFRESH_MINUTES = float(config["Validator"]["REFRESH_MINUTES"])
 # ----------------------
 # Command Balance
-COMMAND_GET_BALANCE = 'desmos q bank balances {} --node {} -o json'.format(
+COMMAND_GET_BALANCE = 'junod q bank balances {} --node {} -o json'.format(
     USER_ADDRESS, DEFAULT_NODE).split(" ")
 # Command Redelegate
 COMMAND_REDELEGATE = 'desmos tx staking delegate {} --from {} --keyring-backend {} REPLACE_AMOUNT --fees {} --gas="auto" --node {} --chain-id {} --yes -o json --broadcast-mode block --gas 250000'.format(
     VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, DEFAULT_NODE, CHAIN_ID)
 # Command Rewards
-COMMAND_GET_REWARDS_BALANCE = 'desmos q distribution rewards {} {} -o json --node {}'.format(
+COMMAND_GET_REWARDS_BALANCE = 'junod q distribution rewards {} {} -o json --node {}'.format(
     USER_ADDRESS, VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
 COMMAND_WITHDRAW_REWARDS = 'desmos tx distribution withdraw-rewards {} --commission --from {} --keyring-backend {} --fees {} --gas="auto" --chain-id {} --node {} --yes -o json --broadcast-mode block --gas 250000'.format(
     VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, CHAIN_ID, DEFAULT_NODE)
 # Command Commissions
-COMMAND_GET_COMMISSION_BALANCE = 'desmos q distribution commission {} -o json --node {}'.format(
+COMMAND_GET_COMMISSION_BALANCE = 'junod q distribution commission {} -o json --node {}'.format(
     VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
 # --------------------------
 
@@ -67,7 +67,7 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-# Execute a shell commands array (for desmos cli)
+# Execute a shell commands array (for junod cli)
 
 
 def cmd(cmds):
@@ -109,7 +109,7 @@ def tx(cmd, password):
         return False
 
 
-class Desmosbot:
+class Junobot:
     started_at = datetime.now()
     total_redelegated = 0
     password = ""
@@ -231,7 +231,7 @@ async def main():
     if(MINIMUM_BALANCE < 1):
         print("\n\n Configuration MINIMUM_BALANCE MUST BE > 1 !!!\n\n")
         raise "MINIMUM_BALANCE ERROR"
-    bot = Desmosbot(password)
+    bot = Junobot(password)
     while(True):
         os.system("clear")
         now = datetime.now()
