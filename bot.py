@@ -39,18 +39,18 @@ DEFAULT_NODE = str(DEFAULT_NODE_ADDRESS + ":" + DEFAULT_NODE_PORT)
 REFRESH_MINUTES = float(config["Validator"]["REFRESH_MINUTES"])
 # ----------------------
 # Command Balance
-COMMAND_GET_BALANCE = 'desmos q bank balances {} --node {} -o json'.format(
+COMMAND_GET_BALANCE = 'junod q bank balances {} --node {} -o json'.format(
     USER_ADDRESS, DEFAULT_NODE).split(" ")
 # Command Redelegate
-COMMAND_REDELEGATE = 'desmos tx staking delegate {} --from {} --keyring-backend {} REPLACE_AMOUNT --fees {} --gas="auto" --node {} --chain-id {} --yes'.format(
+COMMAND_REDELEGATE = 'junod tx staking delegate {} --from {} --keyring-backend {} REPLACE_AMOUNT --fees {} --gas="auto" --node {} --chain-id {} --yes'.format(
     VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, DEFAULT_NODE, CHAIN_ID)
 # Command Rewards
-COMMAND_GET_REWARDS_BALANCE = 'desmos q distribution rewards {} {} -o json --node {}'.format(
+COMMAND_GET_REWARDS_BALANCE = 'junod q distribution rewards {} {} -o json --node {}'.format(
     USER_ADDRESS, VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
-COMMAND_WITHDRAW_REWARDS = 'desmos tx distribution withdraw-rewards {} --commission --from {} --keyring-backend {} --fees {} --gas="auto" --chain-id {} --node {} --yes'.format(
+COMMAND_WITHDRAW_REWARDS = 'junod tx distribution withdraw-rewards {} --commission --from {} --keyring-backend {} --fees {} --gas="auto" --chain-id {} --node {} --yes'.format(
     VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, CHAIN_ID, DEFAULT_NODE)
 # Command Commissions
-COMMAND_GET_COMMISSION_BALANCE = 'desmos q distribution commission {} -o json --node {}'.format(
+COMMAND_GET_COMMISSION_BALANCE = 'junod q distribution commission {} -o json --node {}'.format(
     VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
 # --------------------------
 
@@ -65,7 +65,7 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-# Execute a shell commands array (for desmos cli)
+# Execute a shell commands array (for junod cli)
 
 
 def cmd(cmds):
@@ -97,14 +97,14 @@ def tx(cmd, password):
         return False
 
 
-class Desmosbot:
+class Junobot:
     started_at = datetime.now()
     total_redelegated = 0
     password = ""
     balance = 0
     reward = 0
     commission = 0
-    UDSM = 1000000
+    UJUNO = 1000000
 
     def __init__(self, password):
         self.password = password
@@ -118,7 +118,7 @@ class Desmosbot:
             balance_raw = cmd(COMMAND_GET_BALANCE)
             balance = json.loads(balance_raw)
             amount = float(
-                balance['balances'][0]['amount']) / self.UDSM
+                balance['balances'][0]['amount']) / self.UJUNO
             self.balance = float(amount)
             return True
         except:
@@ -130,7 +130,7 @@ class Desmosbot:
             reward_balance_raw = cmd(COMMAND_GET_REWARDS_BALANCE)
             reward_balance = json.loads(reward_balance_raw)
             reward_amount = float(
-                reward_balance['rewards'][0]['amount']) / self.UDSM
+                reward_balance['rewards'][0]['amount']) / self.UJUNO
             self.reward = float(reward_amount)
             return True
         except:
@@ -142,7 +142,7 @@ class Desmosbot:
             commission_balance_raw = cmd(COMMAND_GET_COMMISSION_BALANCE)
             commission_balance = json.loads(commission_balance_raw)
             commission_amount = float(
-                commission_balance['commission'][0]['amount']) / self.UDSM
+                commission_balance['commission'][0]['amount']) / self.UJUNO
             self.commission = float(commission_amount)
             return True
         except:
@@ -163,7 +163,7 @@ class Desmosbot:
             if(tx_success):
                 return self.reward
         else:
-            print(" > rewards under " + str(REDELEGATE_AT) + " DSM")
+            print(" > rewards under " + str(REDELEGATE_AT) + " JUNO")
         return 0
     # REDELEGATION LOGIC
 
@@ -176,7 +176,7 @@ class Desmosbot:
             if(success):
                 total_rewards_withdrawn = self.commission + self.reward
                 logger.info(now+"Withdrwawn Rewards and Commissions for " +
-                            str(total_rewards_withdrawn) + "DSM")
+                            str(total_rewards_withdrawn) + "JUNO")
         amount_to_redelegate: float = float(
             self.balance) + float(total_rewards_withdrawn) - float(MINIMUM_BALANCE)
         if(amount_to_redelegate >= float(REDELEGATE_AT)):
@@ -184,15 +184,15 @@ class Desmosbot:
                 self.tx_redelegate(amount_to_redelegate)
             self.total_redelegated += amount_to_redelegate
             logger.info(now+"Redelegated " +
-                        str(self.total_redelegated) + "DSM")
+                        str(self.total_redelegated) + "JUNO")
         else:
             print("Rewards and Commissions under " +
-                  str(REDELEGATE_AT) + " DSM")
+                  str(REDELEGATE_AT) + " JUNO")
     # REDELEGATING TRANSACTION
 
     def tx_redelegate(self, amount_in_daric: float):
         print(bcolors.WARNING + "Redelegating..." + bcolors.ENDC)
-        amount_str = str(amount_in_daric * self.UDSM) + "udsm"
+        amount_str = str(amount_in_daric * self.UJUNO) + "ujuno"
         cmdRedelegate = COMMAND_REDELEGATE.replace(
             'REPLACE_AMOUNT', amount_str)
         redelegate_success = tx(
@@ -218,22 +218,22 @@ async def main():
     if(MINIMUM_BALANCE < 1):
         print("\n\n Configuration MINIMUM_BALANCE MUST BE > 1 !!!\n\n")
         raise "MINIMUM_BALANCE ERROR"
-    bot = Desmosbot(password)
+    bot = Junobot(password)
     while(True):
         os.system("clear")
         now = datetime.now()
         print("Started at: " + bcolors.OKCYAN +
               bot.started_at.strftime("%H:%M:%S") + bcolors.ENDC)
         print("Total Redelegations: " + bcolors.OKGREEN +
-              str(bot.total_redelegated) + " DSM" + bcolors.ENDC)
+              str(bot.total_redelegated) + " JUNO" + bcolors.ENDC)
         print("\nLast update: " + bcolors.OKCYAN +
               now.strftime("%H:%M:%S") + bcolors.ENDC)
         print("\n"+bcolors.OKGREEN + "Balance: " +
-              bcolors.ENDC + str(bot.balance) + " DSM")
+              bcolors.ENDC + str(bot.balance) + " JUNO")
         print(bcolors.OKGREEN + "Reward: " +
-              bcolors.ENDC + str(bot.reward) + " DSM")
+              bcolors.ENDC + str(bot.reward) + " JUNO")
         print(bcolors.OKGREEN + "Commissions: " +
-              bcolors.ENDC + str(bot.commission) + " DSM")
+              bcolors.ENDC + str(bot.commission) + " JUNO")
         while True:
             updateSuccess = bot.update()  # update balance, commissions, rewards
             if(updateSuccess):

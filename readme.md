@@ -1,16 +1,17 @@
 # Self Delegator Bot
 
-A simple self delegator bot for Desmos Blockchain
+A simple self delegator bot for Juno Blockchain
+Froked from the [Desmos bot](https://github.com/g-luca/selfdeleg)
 
 ## Requirements
 
-* Desmos CLI
+* Junod CLI
 * Python >= 3
 
 ## 1\. Install
 
 ``` bash
-git clone https://github.com/g-luca/selfdeleg.git && cd selfdeleg && mkdir logs
+git clone https://github.com/lorenzoPrimi/selfdeleg.git && cd selfdeleg && mkdir logs
 ```
 
 ## 2\. Configuration
@@ -26,7 +27,7 @@ If you use the **test** keyring, in the future steps you can replace the passwor
 2. `VALIDATOR_ADDRESS`, `USER_ADDRESS`, `DELEGATE_ADDRESS`, with your addresses.
 If you want to self delegate, `USER_ADDRESS` and `DELEGATE_ADDRESS` should match.
 3. If you are installing the bot in a machine that is not running a node/validator configure `DEFAULT_NODE_ADDRESS` and `DEFAULT_NODE_PORT` with remote nodes addresses
-4. `MINIMUM_BALANCE` amount of DARIC that the bot will always keep (minimum 1 DARIC)
+4. `MINIMUM_BALANCE` amount of JUNO that the bot will always keep (minimum 1 JUNO)
 5. The other configuration values are optional
 
 ## 3\. Run
@@ -69,7 +70,7 @@ and paste changing accordingly the User path and username:
 
 ````
 [Unit]
-Description=Desmos Self Delegator Bot
+Description=Juno Self Delegator Bot
 After=network-online.target
 
 
