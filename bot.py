@@ -42,12 +42,12 @@ REFRESH_MINUTES = float(config["Validator"]["REFRESH_MINUTES"])
 COMMAND_GET_BALANCE = 'junod q bank balances {} --node {} -o json'.format(
     USER_ADDRESS, DEFAULT_NODE).split(" ")
 # Command Redelegate
-COMMAND_REDELEGATE = 'junod tx staking delegate {} --from {} --keyring-backend {} REPLACE_AMOUNT --fees {} --gas="auto" --node {} --chain-id {} --yes'.format(
+COMMAND_REDELEGATE = 'junod tx staking delegate {} --from {} --keyring-backend {} REPLACE_AMOUNT --fees {} --gas="350000" --node {} --chain-id {} --yes'.format(
     VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, DEFAULT_NODE, CHAIN_ID)
 # Command Rewards
 COMMAND_GET_REWARDS_BALANCE = 'junod q distribution rewards {} {} -o json --node {}'.format(
     USER_ADDRESS, VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
-COMMAND_WITHDRAW_REWARDS = 'junod tx distribution withdraw-rewards {} --commission --from {} --keyring-backend {} --fees {} --gas="auto" --chain-id {} --node {} --yes'.format(
+COMMAND_WITHDRAW_REWARDS = 'junod tx distribution withdraw-rewards {} --commission --from {} --keyring-backend {} --fees {} --gas="350000" --chain-id {} --node {} --yes'.format(
     VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, CHAIN_ID, DEFAULT_NODE)
 # Command Commissions
 COMMAND_GET_COMMISSION_BALANCE = 'junod q distribution commission {} -o json --node {}'.format(
