@@ -22,6 +22,9 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 DEBUG_WATCH_ONLY = int(config["Debug"]["DEBUG_WATCH_ONLY"])
 # Validator settings
+CLIENT = str(config["Validator"]["CLIENT"])
+UNIT = str(config["Validator"]["UNIT"])
+BIG_UNIT = str(config["Validator"]["UNIT"])[1:].upper()
 USER_ADDRESS = str(config["Validator"]["USER_ADDRESS"])
 VALIDATOR_ADDRESS = str(config["Validator"]["VALIDATOR_ADDRESS"])
 DELEGATE_ADDRESS = str(config["Validator"]["DELEGATE_ADDRESS"])
@@ -41,8 +44,8 @@ UCOIN_DENOM = str(config["Validator"]["UCOIN_DENOM"])
 REFRESH_MINUTES = float(config["Validator"]["REFRESH_MINUTES"])
 # ----------------------
 # Command Balance
-COMMAND_GET_BALANCE = 'junod q bank balances {} --node {} -o json'.format(
-    USER_ADDRESS, DEFAULT_NODE).split(" ")
+COMMAND_GET_BALANCE = '{} q bank balances {} --node {} -o json'.format(
+    CLIENT, USER_ADDRESS, DEFAULT_NODE).split(" ")
 # Command Redelegate
 COMMAND_REDELEGATE = 'desmos tx staking delegate {} --from {} --keyring-backend {} REPLACE_AMOUNT --fees {} --gas="auto" --node {} --chain-id {} --yes -o json --broadcast-mode block --gas 250000'.format(
     VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, DEFAULT_NODE, CHAIN_ID)
@@ -52,8 +55,8 @@ COMMAND_GET_REWARDS_BALANCE = 'junod q distribution rewards {} {} -o json --node
 COMMAND_WITHDRAW_REWARDS = 'desmos tx distribution withdraw-rewards {} --commission --from {} --keyring-backend {} --fees {} --gas="auto" --chain-id {} --node {} --yes -o json --broadcast-mode block --gas 250000'.format(
     VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, CHAIN_ID, DEFAULT_NODE)
 # Command Commissions
-COMMAND_GET_COMMISSION_BALANCE = 'junod q distribution commission {} -o json --node {}'.format(
-    VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
+COMMAND_GET_COMMISSION_BALANCE = '{} q distribution commission {} -o json --node {}'.format(
+    CLIENT, VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
 # --------------------------
 
 
@@ -67,7 +70,7 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-# Execute a shell commands array (for junod cli)
+# Execute a shell commands array (for the cli)
 
 
 def cmd(cmds):
@@ -109,7 +112,7 @@ def tx(cmd, password):
         return False
 
 
-class Junobot:
+class Delegatebot:
     started_at = datetime.now()
     total_redelegated = 0
     password = ""
@@ -202,7 +205,7 @@ class Junobot:
                   str(REDELEGATE_AT) + " " + COIN_DENOM)
     # REDELEGATING TRANSACTION
 
-    def tx_redelegate(self, amount_in_daric: float):
+    def tx_redelegate(self, amount_to_redelegate: float):
         print(bcolors.WARNING + "Redelegating..." + bcolors.ENDC)
         amount_str = str(amount_in_daric * self.UCOIN) + UCOIN_DENOM
         cmdRedelegate = COMMAND_REDELEGATE.replace(
@@ -231,7 +234,7 @@ async def main():
     if(MINIMUM_BALANCE < 1):
         print("\n\n Configuration MINIMUM_BALANCE MUST BE > 1 !!!\n\n")
         raise "MINIMUM_BALANCE ERROR"
-    bot = Junobot(password)
+    bot = Delegatebot(password)
     while(True):
         os.system("clear")
         now = datetime.now()

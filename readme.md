@@ -1,11 +1,11 @@
 # Self Delegator Bot
 
-A simple self delegator bot for Juno Blockchain
-Froked from the [Desmos bot](https://github.com/g-luca/selfdeleg)
+A simple self delegator bot for any Blockchain on the Cosmos ecosystem <br>
+Forked from the [Desmos bot](https://github.com/g-luca/selfdeleg)
 
 ## Requirements
 
-* Junod CLI
+* A cosmos blockchain CLI
 * Python >= 3
 
 ## 1\. Install
@@ -22,13 +22,14 @@ mv template.ini config.ini && nano config.ini
 
 And edit:
 
-1. `KEY_NAME` with your validator key name, and `KEY_BACKEND` if you use a different [keyring backend](https://docs.cosmos.network/v0.42/run-node/keyring.html). <br>
+1. `CLIENT` with your client command name, and `UNIT` with the smallest unit of the token <br>
+2. `KEY_NAME` with your validator key name, and `KEY_BACKEND` if you use a different [keyring backend](https://docs.cosmos.network/v0.42/run-node/keyring.html). <br>
 If you use the **test** keyring, in the future steps you can replace the password inputs with spaces/random characters
-2. `VALIDATOR_ADDRESS`, `USER_ADDRESS`, `DELEGATE_ADDRESS`, with your addresses.
+3. `VALIDATOR_ADDRESS`, `USER_ADDRESS`, `DELEGATE_ADDRESS`, with your addresses.
 If you want to self delegate, `USER_ADDRESS` and `DELEGATE_ADDRESS` should match.
-3. If you are installing the bot in a machine that is not running a node/validator configure `DEFAULT_NODE_ADDRESS` and `DEFAULT_NODE_PORT` with remote nodes addresses
-4. `MINIMUM_BALANCE` amount of JUNO that the bot will always keep (minimum 1 JUNO)
-5. The other configuration values are optional
+4. If you are installing the bot in a machine that is not running a node/validator configure `DEFAULT_NODE_ADDRESS` and `DEFAULT_NODE_PORT` with remote nodes addresses
+5. `MINIMUM_BALANCE` amount of JUNO that the bot will always keep (minimum 1 JUNO)
+6. The other configuration values are optional
 
 ## 3\. Run
 
