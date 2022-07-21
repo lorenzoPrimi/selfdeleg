@@ -22,6 +22,9 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 DEBUG_WATCH_ONLY = int(config["Debug"]["DEBUG_WATCH_ONLY"])
 # Validator settings
+CLIENT = str(config["Validator"]["CLIENT"])
+UNIT = str(config["Validator"]["UNIT"])
+BIG_UNIT = str(config["Validator"]["UNIT"])[1:].upper()
 USER_ADDRESS = str(config["Validator"]["USER_ADDRESS"])
 VALIDATOR_ADDRESS = str(config["Validator"]["VALIDATOR_ADDRESS"])
 DELEGATE_ADDRESS = str(config["Validator"]["DELEGATE_ADDRESS"])
@@ -39,19 +42,19 @@ DEFAULT_NODE = str(DEFAULT_NODE_ADDRESS + ":" + DEFAULT_NODE_PORT)
 REFRESH_MINUTES = float(config["Validator"]["REFRESH_MINUTES"])
 # ----------------------
 # Command Balance
-COMMAND_GET_BALANCE = 'junod q bank balances {} --node {} -o json'.format(
-    USER_ADDRESS, DEFAULT_NODE).split(" ")
+COMMAND_GET_BALANCE = '{} q bank balances {} --node {} -o json'.format(
+    CLIENT, USER_ADDRESS, DEFAULT_NODE).split(" ")
 # Command Redelegate
-COMMAND_REDELEGATE = 'junod tx staking delegate {} --from {} --keyring-backend {} REPLACE_AMOUNT --fees {} --gas="350000" --node {} --chain-id {} --yes'.format(
-    VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, DEFAULT_NODE, CHAIN_ID)
+COMMAND_REDELEGATE = '{} tx staking delegate {} --from {} --keyring-backend {} REPLACE_AMOUNT --fees {} --gas="350000" --node {} --chain-id {} --yes'.format(
+    CLIENT, VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, DEFAULT_NODE, CHAIN_ID)
 # Command Rewards
-COMMAND_GET_REWARDS_BALANCE = 'junod q distribution rewards {} {} -o json --node {}'.format(
-    USER_ADDRESS, VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
-COMMAND_WITHDRAW_REWARDS = 'junod tx distribution withdraw-rewards {} --commission --from {} --keyring-backend {} --fees {} --gas="350000" --chain-id {} --node {} --yes'.format(
-    VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, CHAIN_ID, DEFAULT_NODE)
+COMMAND_GET_REWARDS_BALANCE = '{} q distribution rewards {} {} -o json --node {}'.format(
+    CLIENT, USER_ADDRESS, VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
+COMMAND_WITHDRAW_REWARDS = '{} tx distribution withdraw-rewards {} --commission --from {} --keyring-backend {} --fees {} --gas="350000" --chain-id {} --node {} --yes'.format(
+    CLIENT, VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, CHAIN_ID, DEFAULT_NODE)
 # Command Commissions
-COMMAND_GET_COMMISSION_BALANCE = 'junod q distribution commission {} -o json --node {}'.format(
-    VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
+COMMAND_GET_COMMISSION_BALANCE = '{} q distribution commission {} -o json --node {}'.format(
+    CLIENT, VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
 # --------------------------
 
 
@@ -65,7 +68,7 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-# Execute a shell commands array (for junod cli)
+# Execute a shell commands array (for the cli)
 
 
 def cmd(cmds):
@@ -97,14 +100,14 @@ def tx(cmd, password):
         return False
 
 
-class Junobot:
+class Delegatebot:
     started_at = datetime.now()
     total_redelegated = 0
     password = ""
     balance = 0
     reward = 0
     commission = 0
-    UJUNO = 1000000
+    UNIT = 1000000
 
     def __init__(self, password):
         self.password = password
@@ -118,7 +121,7 @@ class Junobot:
             balance_raw = cmd(COMMAND_GET_BALANCE)
             balance = json.loads(balance_raw)
             amount = float(
-                balance['balances'][0]['amount']) / self.UJUNO
+                balance['balances'][0]['amount']) / self.UNIT
             self.balance = float(amount)
             return True
         except:
@@ -130,7 +133,7 @@ class Junobot:
             reward_balance_raw = cmd(COMMAND_GET_REWARDS_BALANCE)
             reward_balance = json.loads(reward_balance_raw)
             reward_amount = float(
-                reward_balance['rewards'][0]['amount']) / self.UJUNO
+                reward_balance['rewards'][0]['amount']) / self.UNIT
             self.reward = float(reward_amount)
             return True
         except:
@@ -142,7 +145,7 @@ class Junobot:
             commission_balance_raw = cmd(COMMAND_GET_COMMISSION_BALANCE)
             commission_balance = json.loads(commission_balance_raw)
             commission_amount = float(
-                commission_balance['commission'][0]['amount']) / self.UJUNO
+                commission_balance['commission'][0]['amount']) / self.UNIT
             self.commission = float(commission_amount)
             return True
         except:
@@ -163,7 +166,7 @@ class Junobot:
             if(tx_success):
                 return self.reward
         else:
-            print(" > rewards under " + str(REDELEGATE_AT) + " JUNO")
+            print(" > rewards under " + str(REDELEGATE_AT) + " " + BIG_UNIT)
         return 0
     # REDELEGATION LOGIC
 
@@ -176,7 +179,7 @@ class Junobot:
             if(success):
                 total_rewards_withdrawn = self.commission + self.reward
                 logger.info(now+"Withdrwawn Rewards and Commissions for " +
-                            str(total_rewards_withdrawn) + "JUNO")
+                            str(total_rewards_withdrawn) + " " + BIG_UNIT)
         amount_to_redelegate: float = float(
             self.balance) + float(total_rewards_withdrawn) - float(MINIMUM_BALANCE)
         if(amount_to_redelegate >= float(REDELEGATE_AT)):
@@ -184,15 +187,15 @@ class Junobot:
                 self.tx_redelegate(amount_to_redelegate)
             self.total_redelegated += amount_to_redelegate
             logger.info(now+"Redelegated " +
-                        str(self.total_redelegated) + "JUNO")
+                        str(self.total_redelegated) + " " + BIG_UNIT)
         else:
             print("Rewards and Commissions under " +
-                  str(REDELEGATE_AT) + " JUNO")
+                  str(REDELEGATE_AT) + " " + BIG_UNIT)
     # REDELEGATING TRANSACTION
 
-    def tx_redelegate(self, amount_in_daric: float):
+    def tx_redelegate(self, amount_to_redelegate: float):
         print(bcolors.WARNING + "Redelegating..." + bcolors.ENDC)
-        amount_str = str(amount_in_daric * self.UJUNO) + "ujuno"
+        amount_str = str(amount_to_redelegate * self.UNIT) + UNIT
         cmdRedelegate = COMMAND_REDELEGATE.replace(
             'REPLACE_AMOUNT', amount_str)
         redelegate_success = tx(
@@ -218,22 +221,22 @@ async def main():
     if(MINIMUM_BALANCE < 1):
         print("\n\n Configuration MINIMUM_BALANCE MUST BE > 1 !!!\n\n")
         raise "MINIMUM_BALANCE ERROR"
-    bot = Junobot(password)
+    bot = Delegatebot(password)
     while(True):
         os.system("clear")
         now = datetime.now()
         print("Started at: " + bcolors.OKCYAN +
               bot.started_at.strftime("%H:%M:%S") + bcolors.ENDC)
         print("Total Redelegations: " + bcolors.OKGREEN +
-              str(bot.total_redelegated) + " JUNO" + bcolors.ENDC)
+              str(bot.total_redelegated) + " " + BIG_UNIT + bcolors.ENDC)
         print("\nLast update: " + bcolors.OKCYAN +
               now.strftime("%H:%M:%S") + bcolors.ENDC)
         print("\n"+bcolors.OKGREEN + "Balance: " +
-              bcolors.ENDC + str(bot.balance) + " JUNO")
+              bcolors.ENDC + str(bot.balance) + " " + BIG_UNIT)
         print(bcolors.OKGREEN + "Reward: " +
-              bcolors.ENDC + str(bot.reward) + " JUNO")
+              bcolors.ENDC + str(bot.reward) + " " + BIG_UNIT)
         print(bcolors.OKGREEN + "Commissions: " +
-              bcolors.ENDC + str(bot.commission) + " JUNO")
+              bcolors.ENDC + str(bot.commission) + " " + BIG_UNIT)
         while True:
             updateSuccess = bot.update()  # update balance, commissions, rewards
             if(updateSuccess):
