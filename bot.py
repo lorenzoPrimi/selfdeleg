@@ -23,8 +23,8 @@ config.read("config.ini")
 DEBUG_WATCH_ONLY = int(config["Debug"]["DEBUG_WATCH_ONLY"])
 # Validator settings
 CLIENT = str(config["Validator"]["CLIENT"])
-UNIT = str(config["Validator"]["UNIT"])
-BIG_UNIT = str(config["Validator"]["UNIT"])[1:].upper()
+UCOIN_DENOM = str(config["Validator"]["UNIT"])
+COIN_DENOM = str(config["Validator"]["UNIT"])[1:].upper()
 USER_ADDRESS = str(config["Validator"]["USER_ADDRESS"])
 VALIDATOR_ADDRESS = str(config["Validator"]["VALIDATOR_ADDRESS"])
 DELEGATE_ADDRESS = str(config["Validator"]["DELEGATE_ADDRESS"])
@@ -38,9 +38,6 @@ CHAIN_ID = str(config["Validator"]["CHAIN_ID"])
 DEFAULT_NODE_ADDRESS = str(config["Validator"]["DEFAULT_NODE_ADDRESS"])
 DEFAULT_NODE_PORT = str(config["Validator"]["DEFAULT_NODE_PORT"])
 DEFAULT_NODE = str(DEFAULT_NODE_ADDRESS + ":" + DEFAULT_NODE_PORT)
-
-COIN_DENOM = str(config["Validator"]["COIN_DENOM"])
-UCOIN_DENOM = str(config["Validator"]["UCOIN_DENOM"])
 
 REFRESH_MINUTES = float(config["Validator"]["REFRESH_MINUTES"])
 # ----------------------
