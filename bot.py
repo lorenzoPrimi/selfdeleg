@@ -30,6 +30,7 @@ VALIDATOR_ADDRESS = str(config["Validator"]["VALIDATOR_ADDRESS"])
 DELEGATE_ADDRESS = str(config["Validator"]["DELEGATE_ADDRESS"])
 REDELEGATE_AT = float(config["Validator"]["REDELEGATE_AT"])
 TRANSACTION_FEES = str(config["Validator"]["TRANSACTION_FEES"])
+GAS = str(config["Validator"]["GAS"])
 MINIMUM_BALANCE = float(config["Validator"]["MINIMUM_BALANCE"])
 KEY_NAME = str(config["Validator"]["KEY_NAME"])
 KEY_BACKEND = str(config["Validator"]["KEY_BACKEND"])
@@ -47,13 +48,13 @@ REFRESH_MINUTES = float(config["Validator"]["REFRESH_MINUTES"])
 COMMAND_GET_BALANCE = '{} q bank balances {} --node {} -o json'.format(
     CLIENT, USER_ADDRESS, DEFAULT_NODE).split(" ")
 # Command Redelegate
-COMMAND_REDELEGATE = '{} tx staking delegate {} --from {} --keyring-backend {} REPLACE_AMOUNT --fees {} --gas="auto" --node {} --chain-id {} --yes -o json --broadcast-mode block --gas 250000'.format(
-    CLIENT, VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, DEFAULT_NODE, CHAIN_ID)
+COMMAND_REDELEGATE = '{} tx staking delegate {} --from {} --keyring-backend {} REPLACE_AMOUNT --fees {} --gas {} --node {} --chain-id {} --yes -o json --broadcast-mode block'.format(
+    CLIENT, VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, GAS, DEFAULT_NODE, CHAIN_ID)
 # Command Rewards
 COMMAND_GET_REWARDS_BALANCE = '{} q distribution rewards {} {} -o json --node {}'.format(
     CLIENT, USER_ADDRESS, VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
-COMMAND_WITHDRAW_REWARDS = '{} tx distribution withdraw-rewards {} --commission --from {} --keyring-backend {} --fees {} --gas="auto" --chain-id {} --node {} --yes -o json --broadcast-mode block --gas 250000'.format(
-    CLIENT, VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, CHAIN_ID, DEFAULT_NODE)
+COMMAND_WITHDRAW_REWARDS = '{} tx distribution withdraw-rewards {} --commission --from {} --keyring-backend {} --fees {} --gas {} --chain-id {} --node {} --yes -o json --broadcast-mode block'.format(
+    CLIENT, VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, GAS, CHAIN_ID, DEFAULT_NODE).split(" ")
 # Command Commissions
 COMMAND_GET_COMMISSION_BALANCE = '{} q distribution commission {} -o json --node {}'.format(
     CLIENT, VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
