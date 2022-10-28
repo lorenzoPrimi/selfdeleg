@@ -207,7 +207,7 @@ class Delegatebot:
 
     def tx_redelegate(self, amount_to_redelegate: float):
         print(bcolors.WARNING + "Redelegating..." + bcolors.ENDC)
-        amount_str = str(amount_in_daric * self.UCOIN) + UCOIN_DENOM
+        amount_str = str(amount_to_redelegate * self.UCOIN) + UCOIN_DENOM
         cmdRedelegate = COMMAND_REDELEGATE.replace(
             'REPLACE_AMOUNT', amount_str)
         redelegate_success = tx(
