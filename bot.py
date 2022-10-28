@@ -54,7 +54,7 @@ COMMAND_REDELEGATE = '{} tx staking delegate {} --from {} --keyring-backend {} R
 COMMAND_GET_REWARDS_BALANCE = '{} q distribution rewards {} {} -o json --node {}'.format(
     CLIENT, USER_ADDRESS, VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
 COMMAND_WITHDRAW_REWARDS = '{} tx distribution withdraw-rewards {} --commission --from {} --keyring-backend {} --fees {} --gas {} --chain-id {} --node {} --yes -o json --broadcast-mode block'.format(
-    CLIENT, VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, GAS, CHAIN_ID, DEFAULT_NODE).split(" ")
+    CLIENT, VALIDATOR_ADDRESS, KEY_NAME, KEY_BACKEND, TRANSACTION_FEES, GAS, CHAIN_ID, DEFAULT_NODE)
 # Command Commissions
 COMMAND_GET_COMMISSION_BALANCE = '{} q distribution commission {} -o json --node {}'.format(
     CLIENT, VALIDATOR_ADDRESS, DEFAULT_NODE).split(" ")
@@ -218,7 +218,6 @@ class Delegatebot:
 
     def tx_withdrawRewards(self):
         print(bcolors.WARNING + "Withdrawing rewards..." + bcolors.ENDC)
-        print(COMMAND_WITHDRAW_REWARDS)
         withdraw_success = tx(
             COMMAND_WITHDRAW_REWARDS, self.password)
         return withdraw_success
