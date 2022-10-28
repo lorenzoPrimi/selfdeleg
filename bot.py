@@ -95,6 +95,7 @@ def read_tx_success(tx_result):
 def tx(cmd, password):
     try:
         child = pexpect.spawn(cmd, timeout=10)
+        child.sendline(password)
         child.expect('.*')
         success = read_tx_success(child.read())
         if not success:
